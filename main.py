@@ -1,48 +1,26 @@
 import requests
 from send_email import send_email
 
+topic = "tesla"
+
 api_key = "c1c718a3a1d34277966889b9df18cf7a"
-url = "https://newsapi.org/v2/everything?q=tesla&from=2023-09-24&sortBy=publishedAt&apiKey=c1c718a3a1d34277966889b9df18cf7a"
+url = "https://newsapi.org/v2/everything?" \
+    f"q={topic}&" \
+    "sortBy=publishedAt&" \
+    f"apiKey=c1c718a3a1d34277966889b9df18cf7a&" \
+    "language=en"
 
 # Make a request
 request = requests.get(url)
 
 content = request.json()
 
-body = ""
+body = "Subject: Todays News\n\n"  # Set the subject header here
 
-for article in content["articles"]:
-    title = article.get("title", "")
-    description = article.get("description", "")
+for article in content["articles"][:20]:
+    if article["title"] is not None and article["description"] is not None:
+        body += article["title"] + "\n" + article["description"] + "\n" + article["url"] + "\n\n"
 
-    if title:
-        body = body + title + "\n"
-
-    if description:
-        body = body + description + 2 * "\n"
-
-# Encode the message as UTF-8
 body = body.encode("utf-8")
-
 send_email(message=body)
-
-
-# Check if the request was successful
-# if response.status_code == 200:
-#     content = response.json()
-
-#     # Create an empty message to accumulate news content  
-#     raw_message = ""
-
-#     for article in content["articles"]:
-#         title = article["title"]
-#         description = article["description"]
-#         raw_message += f"{title}\n{description}\n\n"
-
-#     user_email = "sefiujon@gmail.com"
-
-#     # Send the email with the news content
-#     send_email(user_email, raw_message)
-# else:
-#     print("Failed to retrieve news data")
-
+# &from=2023-09-24&
